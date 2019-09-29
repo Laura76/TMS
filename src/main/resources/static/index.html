@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>学员管理系统</title>
+	<meta name="renderer" content="webkit">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  	<link rel="stylesheet" href="./layui/css/layui.css"  media="all">
+	<script src="./layui/layui.js" charset="utf-8"></script> 
+ 
+</head>
+<body>
+	 <table id="demo" lay-filter="test"></table>
+<script>
+	layui.use(['table'], function()
+	{
+		  var table = layui.table;
+		  
+		  //第一个实例
+		  table.render({
+		    elem: '#demo'
+		    ,height: 312
+		    ,url: './users/getAllUsers' //数据接口
+		    ,page: true //开启分页
+		    ,cols: [[ //表头
+		    	 {field: 'username', title: '部门名称', width:200}
+			      ,{field: 'password', title: '姓名', width:100}
+			      ,{field: 'isvalid', title: '性别', width:100}
+		    ]],
+		    page:false
+		    ,parseData: function(res)
+		    {
+		    	//res 即为原始返回的数据，来修改返回数据
+		    	var data=res.message.data;
+		    	
+		    	
+		        return {
+		          "code": res.state, //解析接口状态
+		          "msg": res.error, //解析提示文本
+		          "count":res.message.data.length, //解析数据长度
+		          "data": data //解析数据列表
+		        };
+		      }
+		  });
+		  
+		});
+		
+	</script>
+
+</body>
+</html>
