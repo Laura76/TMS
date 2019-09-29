@@ -13,11 +13,11 @@ import cvc.framework.entity.User;
 public interface IUsersMapper 
 {
 
-	@Select("select * from T_USER")
+	@Select("select * from T_USER where username=#{username} and password=#{password}")
 	@Results({
 		@Result(column="username",property="username"),
 		@Result(column="password",property="password"),
 		@Result(column="isvalid",property="isvalid"),
 	})
-	public List<User> getAllUsers();
+	public List<User> checkUser(String username,String password);
 }

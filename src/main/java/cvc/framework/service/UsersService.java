@@ -16,9 +16,8 @@ public class UsersService
 	@Autowired
 	private IUsersMapper mapper;
 	
-	public List<User> getAllUsers()
+	public List<User> checkUser(String username,String password)
 	{
-		System.out.println(mapper);
-		return mapper.getAllUsers();
+		return mapper.checkUser(username,password);
 	}
 }
