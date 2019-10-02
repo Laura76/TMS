@@ -3,7 +3,7 @@
 }
 .tmsrow{
 	border-style: solid; 
-	border-width: 1px;
+	border-width: 0.5px;
 }
 .tmstitle{
 	margin:2% 10%;
@@ -25,25 +25,48 @@
 	margin-bottom:4px;
 	background-color:#59A1BF;
 	text-align:center;
+	vertical-align:center;
 	box-shadow:2px 2px 5px #333333;
+}
+.tmslicurr{
+	height:40px;
+	margin-bottom:4px;
+	background-color:#ff4692;
+	text-align:center;
+	box-shadow:2px 2px 5px #ff4692;
 }
 .font{
 	font-family: Arial;
 	color:white;
+
 }
 .tmsbody{
-	border-style: solid; 
-	border-width: 1px;
 	position:fixed;
 	top:85px;
 	bottom:0px;
 	left:200px;
 	right:0px;
 }
-.tmsbutton{
+.tmsform{
+	margin-top:20px;
+}
+.tmsbutton0{
+	border-radius: 10px;
+	background-color:#009ad8;
+}
+.tmsbutton1{
+	border-radius: 10px;
+	position:fixed;
+	top:105px;
+	right:150px;
+}
+.tmsbutton2{
 	border-radius: 10px;
 	background-color: #FF9999;
 	position:fixed;
-	top:85px;
+	top:105px;
 	right:30px;
+}
+.demo-class .layui-layer-title{
+	background:#d3d3d3; color:#fff; border: none;
 }

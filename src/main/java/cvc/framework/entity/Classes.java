@@ -7,9 +7,11 @@ import java.util.Date;
  */
 public class Classes 
 {
+	//序号-班级名称-类别-教师-计划招生人数-当前人数-开班时间-结束时间-上课周期
 	private int ordernumber;
 	private String clname;
 	private String caname;
+	private String teacher;
 	private int clenrolment;
 	private int currenrolment;
 	private Date clstarttime;
@@ -35,6 +37,12 @@ public class Classes
 	}
 	public void setCaname(String caname) {
 		this.caname = caname;
+	}
+	public String getTeacher() {
+		return teacher;
+	}
+	public void setTeacher(String teacher) {
+		this.teacher = teacher;
 	}
 	public int getClenrolment() {
 		return clenrolment;

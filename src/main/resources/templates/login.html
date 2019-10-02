@@ -54,6 +54,7 @@ layui.use(['form'], function(){
         data:JSON.stringify(data.field),
         timeout:2000,
         success:function(data){
+        	console.log(data.field);
             if(data.message.data== 1){
                 layer.msg("登陆成功");
                 //跳转到另一个页面，使用URL的方式
@@ -66,7 +67,8 @@ layui.use(['form'], function(){
             layer.msg("密码或者用户名错误")
         }
     });
-    return true;
+	//如果返回true的话就会不进入success的回调
+    return false;
   });
   
 });
