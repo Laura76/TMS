@@ -18,12 +18,13 @@ public class ClassController {
 	
 	@Autowired
 	private ClassService service;
-	
+	//跳转到班级管理页面
 	@RequestMapping("/tmsclass")
 	public String classPage() {
+		
 		return "class";
 	}
-	
+	//查询某些课-根据班级名称，类别，教师姓名
 	@RequestMapping(value="/searchClass",method=RequestMethod.POST)
 	@ResponseBody
 	public RestResult checkUser(@RequestBody Classes classes)

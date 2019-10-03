@@ -16,7 +16,11 @@
     <div class="layui-col-md4">
     </div>
     <div class="layui-col-md4">
-      <form class="layui-form" action="" lay-filter="example">
+     <h1 style="margin-bottom:10%;margin-left:10%; font-size:40px;">
+      <b>XXXX学员管理系统</b>
+	  </h1>
+    <div style="padding:40px; background-color: #F2F2F2;">
+      <form class="layui-form" lay-filter="example">
   	    <div class="layui-form-item">
         <label class="layui-form-label">用户名</label>
         <div class="layui-input-block">
@@ -31,10 +35,11 @@
         </div> 
         <div class="layui-form-item">
         <div class="layui-input-block">
-        <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">登录</button>
+        <button type="submit" class="layui-btn" style="margin-left:30%" lay-submit="" lay-filter="demo1">登录</button>
         </div>
         </div>
       </form>
+      </div>
     </div>
     <div class="layui-col-md4">
     </div>
@@ -47,7 +52,7 @@ layui.use(['form'], function(){
   form.on('submit(demo1)', function(data){
 	var $=layui.jquery;
 	$.ajax({
-        url:'/users/checkUser',
+        url:'/checkUser',
         type:'post',
         dataType:'json',
         contentType: 'application/json;charset=utf-8',
@@ -58,7 +63,7 @@ layui.use(['form'], function(){
             if(data.message.data== 1){
                 layer.msg("登陆成功");
                 //跳转到另一个页面，使用URL的方式
-                location.href = "";
+                location.href = "/tmsclass";
             }else{
                 layer.msg("密码或者用户名错误")
             }

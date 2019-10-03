@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>教师管理</title>
+  <title>学员管理</title>
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -23,15 +23,19 @@
   <div class="tmsside">
     <ul class="tmsul">
       <li class="tmsli"><a class="font" href="/tmsclass">班级管理</a></li>
-      <li class="tmslicurr"><a class="font" href="tmsteacher">教师管理</a></li>
-      <li class="tmsli"><a class="font" href="/tmsstudent">学员管理</a></li>
+      <li class="tmsli"><a class="font" href="tmsteacher">教师管理</a></li>
+      <li class="tmslicurr"><a class="font" href="/tmsstudent">学员管理</a></li>
     </ul>
   </div>
   <div class="tmsbody">
   <form class="layui-form tmsform" action="">
   <div class="layui-form-item">
     <div class="layui-inline">
-      <label class="layui-form-label">教师姓名:</label>
+      <label class="layui-form-label">学员姓名:</label>
+      <div class="layui-input-inline">
+        <input name="clname" autocomplete="off" class="layui-input">
+      </div>
+      <label class="layui-form-label">班级名称:</label>
       <div class="layui-input-inline">
         <input name="clname" autocomplete="off" class="layui-input">
       </div>
@@ -42,7 +46,7 @@
     </div>
   </div>
   </form>
-  <button  type="button" class="layui-btn tmsbutton2" id="addTeacher">添加教师</button>
+  <button  type="button" class="layui-btn tmsbutton2" id="addTeacher">添加学员</button>
   <table id="demo" lay-filter="test"></table>
   </div>
   
