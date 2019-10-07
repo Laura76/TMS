@@ -21,25 +21,33 @@ public class ClassController {
 	//跳转到班级管理页面
 	@RequestMapping("/tmsclass")
 	public String classPage() {
-		
 		return "class";
 	}
-	//查询某些课-根据班级名称，类别，教师姓名
+	//查询某些课-根据班级名称、某个具体类别、教师姓名
 	@RequestMapping(value="/searchClass",method=RequestMethod.POST)
 	@ResponseBody
-	public RestResult checkUser(@RequestBody Classes classes)
+	public RestResult searchClass(@RequestBody Classes classes)
 	{
 		RestResult result=new RestResult();
 		String clname=classes.getClname();
 		String caname=classes.getCaname();
 		String teacher=classes.getTeacher();
-		if(caname=="") {
-		}
+		System.out.println(caname+"s");
 		result.state=0;
 		result.error="";
 		result.message=new RestMessage();
 		result.message.data=service.searchClass(clname,caname,teacher);
 		return result;
 	}
-	
+	//查询某些课-根据班级名称、所有类别、教师姓名
+	@RequestMapping(value="/searchAllClass",method=RequestMethod.GET)
+	@ResponseBody
+	public RestResult searchAllClass(String clname,String teacher) {
+		RestResult result=new RestResult();
+		result.state=0;
+		result.error="";
+		result.message=new RestMessage();
+		result.message.data=service.searchAllClass(clname,teacher);
+		return result;
+	}
 }
