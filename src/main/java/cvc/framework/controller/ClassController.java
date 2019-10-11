@@ -64,6 +64,7 @@ public class ClassController {
 		result.message.data=service.addClass(classes);
 		return result;
 	}
+	//今日有课
 	@RequestMapping(value="/searchTodayClass",method=RequestMethod.GET)
 	@ResponseBody
 	public RestResult searchTodayClass(String todayTime)
@@ -82,7 +83,7 @@ public class ClassController {
 		result.state=0;
 		result.error="";
 		result.message=new RestMessage();
-		result.message.data=service.searchTodayClass(date,0);
+		result.message.data=service.searchTodayClass(date,cycle);
 		return result;
 	}	
 }
