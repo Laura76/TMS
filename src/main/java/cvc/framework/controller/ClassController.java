@@ -1,5 +1,11 @@
 package cvc.framework.controller;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,20 +29,16 @@ public class ClassController {
 	public String classPage() {
 		return "class";
 	}
-	//查询某些课-根据班级名称、某个具体类别、教师姓名
-	@RequestMapping(value="/searchClass",method=RequestMethod.POST)
+	//查询某些课-根据班级名称、某个具体类别
+	@RequestMapping(value="/searchClass",method=RequestMethod.GET)
 	@ResponseBody
-	public RestResult searchClass(@RequestBody Classes classes)
+	public RestResult searchClass(String clname,String caname)
 	{
 		RestResult result=new RestResult();
-		String clname=classes.getClname();
-		String caname=classes.getCaname();
-		String teacher=classes.getTeacher();
-		System.out.println(caname+"s");
 		result.state=0;
 		result.error="";
 		result.message=new RestMessage();
-		result.message.data=service.searchClass(clname,caname,teacher);
+		result.message.data=service.searchClass(clname,caname);
 		return result;
 	}
 	//查询某些课-根据班级名称、所有类别、教师姓名
@@ -50,4 +52,37 @@ public class ClassController {
 		result.message.data=service.searchAllClass(clname,teacher);
 		return result;
 	}
+	//添加班级
+	@RequestMapping(value="/addClass",method=RequestMethod.POST)
+	@ResponseBody
+	public RestResult checkUser(@RequestBody Classes classes)
+	{
+		RestResult result=new RestResult();
+		result.state=0;
+		result.error="";
+		result.message=new RestMessage();
+		result.message.data=service.addClass(classes);
+		return result;
+	}
+	@RequestMapping(value="/searchTodayClass",method=RequestMethod.GET)
+	@ResponseBody
+	public RestResult searchTodayClass(String todayTime)
+	{
+		RestResult result=new RestResult();
+		DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+		Date date=null;
+		try {    
+	           date = format1.parse(todayTime);   
+		} catch (ParseException e) {    
+	           e.printStackTrace();    
+		}
+		int[] weekDays = {0, 1, 2,3,4, 5, 6};
+        Calendar calendar=Calendar.getInstance();
+        int cycle=weekDays[calendar.get(Calendar.DAY_OF_WEEK)-1];
+		result.state=0;
+		result.error="";
+		result.message=new RestMessage();
+		result.message.data=service.searchTodayClass(date,0);
+		return result;
+	}	
 }

@@ -53,28 +53,31 @@
     </div>
   </div>
   </form>
-  <button type="button" class="layui-btn layui-btn-radius tmsbutton1">今日有课</button>
-  <button  type="button" class="layui-btn tmsbutton2">新建班级</button>
+  <button type="button" class="layui-btn layui-btn-radius tmsbutton1" id="todayClass">今日有课</button>
+  <button  type="button" class="layui-btn tmsbutton2" id="addClass">新建班级</button>
   <table id="demo" lay-filter="test" class="tmstable"></table>
   </div>
   <script>
-  layui.use(['table','form'], function()
+  layui.use(['table','form','laydate'], function()
 	{
 	  var table = layui.table;
 	  var form=layui.form;
 	  var $=layui.jquery;
 	  var layer=layui.layer;
+	  var laydate = layui.laydate;
+	  
 	  form.on('submit(demo1)', function(data){
 		var submitData=data.field;
 		if(submitData.clname==''&&submitData.teacher==''){
 			layer.msg('请输入班级或者教师');
 			return false;
 		}else{
-			var urlname='searchClass';
+			var urlname='';
 			if(submitData.caname==''){
 				urlname='searchAllClass';
+			}else if(submitData.teacher==''){
+				urlname="searchClass?clname="+submitData.clname+"&caname="+submitData.caname;
 			}
-			urlname=urlname+"?clname="+submitData.clname+"&teacher="+submitData.teacher;
 			table.render({
 			    elem: '#demo'
 			    ,url:urlname
@@ -82,9 +85,13 @@
 			    ,cols: [
 			    	[
 			    	{field: 'clname', title: '班级名称'},
+			    	{field: 'caname', title: '类别'},
+			    	{field: 'tename', title: '教师'},
 			    	{field: 'clenrolment', title: '计划招生人数'},
+			    	{field: 'currenrolment', title: '当前人数'},
 			    	{field: 'clstarttime', title: '开班时间'},
 			    	{field: 'clendtime', title: '结束时间'},
+			    	{field: 'ctcycle', title: '上课周期'},
 			    ]
 			    	]
 				,page:true
@@ -102,7 +109,209 @@
 			return false;
 		}
 	  });
-		  
+	  
+	  $(document).on('click','#addClass',function(){
+		  layer.open({
+			skin:'demo-class'
+	        ,type: 1
+	        ,title: ['新建班级','text-align:center']
+	        ,closeBtn: 1
+	        ,area: ['600px','700px']
+	        ,offset:'10px'
+	        ,shade: 0.8
+	        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+	        ,shade:0
+	        ,moveType: 1 //拖拽模式，0或者1
+	        ,content: 
+	        	'<div class="layui-row">'+
+	        	'<form class="layui-form" action="" id="innerform">'+
+	        	'<div class="layui-form-item">'+
+	        	'<label class="layui-form-label">班级名称：</label>'+
+	        	'<div class="layui-input-block">'+
+	              '<input name="clname" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
+	            '</div>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	            '<label class="layui-form-label">类别：</label>'+
+	            '<div class="layui-input-block">'+
+	              '<select name="caid" lay-filter="aihao">'+
+	                '<option value="1" selected>美术</option>'+
+	                '<option value="2" >音乐</option>'+
+	              '</select>'+
+	            '</div>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	            '<label class="layui-form-label">教师：</label>'+
+	            '<div class="layui-input-block">'+
+	              '<select name="teid" lay-filter="aihao">'+
+	                '<option value="1" selected>王晓鹏</option>'+
+	                '<option value="2" >张丽华</option>'+
+	              '</select>'+
+	            '</div>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	        	'<label class="layui-form-label">开始时间：</label>'+
+	        	'<div class="layui-input-block">'+
+	        	  '<input type="text" class="layui-input" name="clstarttime" id="clstarttime">'+
+	            '</div>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	        	'<label class="layui-form-label">结束时间：</label>'+
+	        	'<div class="layui-input-block">'+
+	        	  '<input type="text" class="layui-input" name="clendtime" id="clendtime" >'+
+	            '</div>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	        	'<label class="layui-form-label">计划招生人数：</label>'+
+	        	'<div class="layui-input-block">'+
+	              '<input name="clenrolment" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
+	            '</div>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	        	'<label class="layui-form-label">上课周期：</label>'+
+	        	'<div class="layui-input-block">'+
+	        	  '<input type="checkbox" name="1" title="周一">'+
+		          '<label class="">时间：</label>'+
+	              '<input name="start1" type="text" class="time" placeholder="H点m分">'+
+	              '<input name="end1" type="text" class="time" placeholder="H点m分">'+
+	            '</div>'+
+	            '<div class="layui-input-block">'+
+	        	  '<input type="checkbox" name="2" title="周二">'+
+	        	  '<label class="">时间：</label>'+
+	              '<input name="start2" type="text" class="time" placeholder="H点m分">'+
+	              '<input name="end2" type="text" class="time" placeholder="H点m分">'+
+	            '</div>'+
+	            '<div class="layui-input-block">'+
+	        	  '<input type="checkbox" name="3" title="周三">'+
+	        	  '<label class="">时间：</label>'+
+	              '<input name="start3" type="text" class="time" placeholder="H点m分">'+
+	              '<input name="end3" type="text" class="time" placeholder="H点m分">'+
+	            '</div>'+
+	            '<div class="layui-input-block">'+
+	        	  '<input type="checkbox" name="4" title="周四">'+
+	        	  '<label class="">时间：</label>'+
+	              '<input name="start4" type="text" class="time" placeholder="H点m分">'+
+	              '<input name="end4" type="text" class="time" placeholder="H点m分">'+
+	            '</div>'+
+	            '<div class="layui-input-block">'+
+	        	  '<input type="checkbox" name="5" title="周五">'+
+	        	  '<label class="">时间：</label>'+
+	              '<input name="start5" type="text" class="time" placeholder="H点m分">'+
+	              '<input name="end5" type="text" class="time" placeholder="H点m分">'+
+	            '</div>'+
+	            '<div class="layui-input-block">'+
+	        	  '<input type="checkbox" name="6" title="周六">'+
+	        	  '<label class="">时间：</label>'+
+	              '<input name="start6" type="text" class="time" placeholder="H点m分">'+
+	              '<input name="end6" type="text" class="time" placeholder="H点m分">'+
+	            '</div>'+
+	            '<div class="layui-input-block">'+
+	        	  '<input type="checkbox" name="0" title="周日">'+
+	        	  '<label class="">时间：</label>'+
+	              '<input name="start0" type="text" class="time" placeholder="H点m分">'+
+	              '<input name="end0" type="text" class="time" placeholder="H点m分">'+
+	            '</div>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	            '<div class="layui-input-block">'+
+	              '<button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="demo2">确定</button>'+
+	              '<button type="reset" class="layui-btn layui-btn-primary tmsbutton0">取消</button>'+
+	            '</div>'+
+	            '</div>'+
+	            '</form>'+
+	            '</div>'
+	        ,success:function(){
+	        	form.render();
+	        	laydate.render({
+	        	    elem: '#clstarttime' //指定元素
+	        	});
+	        	laydate.render({
+	        	    elem: '#clendtime' //指定元素
+	        	});
+	        	$('.time').each(function(){
+	        		laydate.render({
+	        		elem: this
+	        		,type: 'time'
+	        		,format: 'HH:mm'
+	        		});
+	        	})
+        	   //监听提交
+        	    form.on('submit(demo2)', function(data){
+        	      data.field.cycles=[];
+        	      for(let i=0;i<7;i++){
+        	    	  if(data.field[i]=="on"){
+        	    	      data.field.cycles.push(i+" "+data.field["start"+i]+" "+data.field["end"+i]);
+        	    	  }
+        	      }
+        	      $.ajax({
+        	          url:'/addClass',
+        	          type:'post',
+        	          dataType:'json',
+        	          contentType: 'application/json;charset=utf-8',
+        	          data:JSON.stringify(data.field),
+        	          timeout:2000,
+        	          success:function(data){
+        	              if(data.message.data==1){
+        	                  layer.msg("添加成功");
+        	                  //跳转到另一个页面，使用URL的方式
+        	                  location.href = "/tmsclass";
+        	              }else{
+        	                  layer.msg("添加失败")
+        	              }
+        	          },
+        	          error:function () {
+        	              layer.msg("添加失败")
+        	          }
+        	      });
+        	      return false;
+        	    });
+	        },
+		 });
+	  });
+	  $(document).on('click','#todayClass',function(){
+	    var day2 = new Date();
+	    day2.setTime(day2.getTime());
+	    var s = day2.getFullYear()+"-" + (day2.getMonth()+1) + "-" + day2.getDate();
+	    var urlname='';
+
+	    urlname="searchTodayClass?todayTime="+s;
+		table.render({
+		    elem: '#demo'
+		    ,url:urlname
+		    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+		    ,cols: [
+		    	[
+		    	{field: 'clname', title: '班级名称'},
+		    	{field: 'caname', title: '类别'},
+		    	{field: 'tename', title: '教师'},
+		    	{field: 'clenrolment', title: '计划招生人数'},
+		    	{field: 'currenrolment', title: '当前人数'},
+		    	{field: 'clstarttime', title: '开班时间'},
+		    	{field: 'clendtime', title: '结束时间'},
+		    	{field: 'ctcycle', title: '上课周期'},
+		    ]
+		    	]
+			,page:true
+			,parseData: function(res)
+		    {
+				for(let i=0;i<res.message.data.length;i++){
+					let temp=res.message.data[i].clstarttime.substring(0,10);
+					res.message.data[i].clstarttime=temp;
+					temp=res.message.data[i].clendtime.substring(0,10);
+					res.message.data[i].clendtime=temp;
+				}				
+		    	//res 即为原始返回的数据
+		        return {
+		          "code": res.state, //解析接口状态
+		          "msg": res.error, //解析提示文本
+		          "count":res.message.data.length, //解析数据长度
+		          "data": res.message.data //解析数据列表
+		        };
+		      }
+		  });
+			return false;
+	  });
+	  
 	});
 </script>
 </body>
