@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>班级管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="./layui/css/layui.css"  media="all">
+  <link rel="stylesheet" href="./css/tms.css" media="all"> 
+  <script src="./layui/layui.js" charset="utf-8"></script> 
+</head>
+<body>
+  <div class="layui-row tmsrow">
+    <div class="layui-col-md9">
+      <h1 class="tmstitle">
+      <b>XXXX学员管理系统</b>
+	  </h1>
+    </div>
+    <div class="layui-col-md3">
+    </div>
+  </div>
+  <div class="tmsside">
+    <ul class="tmsul">
+      <li class="tmslicurr"><a class="font" href="/tmsclass">班级管理</a></li>
+      <li class="tmsli"><a class="font" href="/tmsteacher">教师管理</a></li>
+      <li class="tmsli"><a class="font" href="/tmsstudent">学员管理</a></li>
+    </ul>
+  </div>
+  <div class="tmsbody">
+  <button  type="button" class="layui-btn tmsbutton2" id="addClass">加入学员</button>
+  <table id="demo" lay-filter="test" class="tmstable" style="margin-top:5%;"></table>
+  </div>
+<script>
+layui.use(['table','form','laydate'], function()
+{
+	var clid;
+	var url = location.search; //获取url中"?"符后的字串
+	   if (url.indexOf("?") != -1) {    //判断是否有参数
+	      var str = url.substr(1); //从第一个字符开始 因为第0个是?号 获取所有除问号的所有符串
+	      strs = str.split("=");   //用等号进行分隔 （因为知道只有一个参数 所以直接用等号进分隔 如果有多个参数 要用&号分隔 再用等号进行分隔）
+	      clid=strs[1];          //直接弹出第一个参数 （如果有多个参数 还要进行循环的）
+	   }
+	var table = layui.table;
+	var urlname="searchClassStu?clid="+clid;
+	table.render({
+    elem: '#demo'
+    ,url:urlname
+    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+    ,cols: [
+    	[
+        {field: '', title: '序号'},
+    	{field: 'stname', title: '学员姓名'},
+    	{field: 'stage', title: '年龄'},
+    	{field: '', title: '报班时间'},
+    	{field: '', title: '已用课时'},
+    	{field: '', title: '剩余课时'},
+    ]
+    	]
+	,page:true
+	,parseData: function(res)
+    {
+    	//res 即为原始返回的数据
+        return {
+          "code": res.state, //解析接口状态
+          "msg": res.error, //解析提示文本
+          "count":res.message.data.length, //解析数据长度
+          "data": res.message.data //解析数据列表
+        };
+      }
+  	});
+	var $=layui.jquery;
+	var form=layui.form;
+	$(document).on('click','#addClass',function(){
+		  layer.open({
+			skin:'demo-class'
+	        ,type: 1
+	        ,title: ['添加学员','text-align:center']
+	        ,closeBtn: 1
+	        ,area: ['800px','700px']
+	        ,offset:'10px'
+	        ,shade: 0.8
+	        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+	        ,shade:0
+	        ,moveType: 1 //拖拽模式，0或者1
+	        ,content: 
+	        	'<div class="layui-row">'+
+	        	'<form class="layui-form" action="" id="innerform">'+
+	        	'<div class="layui-form-item">'+
+	        	'<label class="layui-form-label">姓名：</label>'+
+	        	'<div class="layui-input-inline">'+
+	              '<input name="clname" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
+	             '</div>'+
+	            '<label class="layui-form-label">年龄：</label>'+
+	        	'<div class="layui-input-inline">'+
+	              '<input name="clname" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
+	            '</div>'+
+	            '<button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="demo2">查询</button>'+
+	            '</div>'+
+	            '</form>'+
+	            '<form class="layui-form" action="" id="stuInfotable">'+
+	            '<div class="layui-form-item">'+
+	            '  <table id="allStu" lay-filter="test" class="tmstable"></table>'+
+	            '</div>'+
+	            '<div class="layui-form-item">'+
+	            '<div class="layui-input-block">'+
+	              '<button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="stuConfirm">确定</button>'+
+	              '<button type="reset" class="layui-btn layui-btn-primary tmsbutton0">取消</button>'+
+	            '</div>'+
+	            '</div>'+
+	            '</form>'+
+	            '</div>'
+	        ,success:function(){
+	        form.render();
+	        //学员表的数据表格的动态获取-并返回是否已在该班级
+	        var urlname="searchAllStu?clid="+clid;
+	        var oldStu=[];
+	        table.render({
+			    elem: '#allStu'
+			    ,url:urlname
+			    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+			    ,cols: [
+			    	[
+				    {fixed: 'right', title: '', toolbar: '#tableBtn', width: 60, align: 'center'},
+			    	{field: 'number', title: '序号'},
+			    	{field: 'stname', title: '姓名'},
+			    	{field: 'stgender', title: '性别'},
+			    	{field: 'stage', title: '年龄'},
+			    ]
+			    	]
+				,page:false
+				,parseData: function(res)
+			    {
+					var temp=res.message.data;
+					for(let i=0;i<temp.length;i++){
+						temp[i].stgender=(temp[i].stgender==1)?'男':'女';
+						temp[i].number=i+1;
+						if(temp[i].clid!=null)oldStu.push(temp[i].stid);//记录下原先的学生的stid
+					}
+			    	//res 即为原始返回的数据
+			        return {
+			          "code": res.state, //解析接口状态
+			          "msg": res.error, //解析提示文本
+			          "count":res.message.data.length, //解析数据长度
+			          "data": res.message.data //解析数据列表
+			        };
+			      }
+			  });
+      	   //监听提交
+      	    form.on('submit(stuConfirm)', function(data){
+      	    	var newStu=[];
+      	    	console.log(data.field);
+      	    	for(var i in data.field){
+      	    		if(data.field[i]=='on'){
+      	    			newStu.push(i);
+      	    		}
+      	    	}
+      	    	var deleteStu=[];
+      	    	var addStu=[];
+      	    	for(let j=0;j<oldStu.length;j++){
+      	    		if()
+      	    	}
+      	      return false;
+      	    });
+	        },
+		 });
+	  });
+});
+</script>
+<script type="text/html" id="tableBtn">
+	{{#if (d.clid == null) { }}
+	<input type="checkbox" name={{d.stid}} lay-skin="primary" title="">
+	{{# }else{ }}
+	<input type="checkbox" name={{d.stid}} lay-skin="primary" title="" checked="">
+	{{# } }}
+</script>
+</body>
+</html>

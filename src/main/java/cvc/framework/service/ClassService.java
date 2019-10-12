@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import cvc.framework.entity.ClassTime;
 import cvc.framework.entity.Classes;
+import cvc.framework.entity.Student;
 import cvc.framework.mapper.IClassMapper;
 
 @Service
@@ -53,5 +54,11 @@ public class ClassService
 	public List<Classes> searchTodayClass(Date todayTime,int cycle)
 	{
 		return mapper.searchTodayClass(todayTime,cycle);
+	}
+	public List<Student> searchClassStu(String clid){
+		return mapper.searchClassStu(clid);
+	}
+	public List<Student> searchAllStu(String clid){
+		return mapper.searchAllStu(clid);
 	}
 }

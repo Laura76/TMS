@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -86,4 +87,37 @@ public class ClassController {
 		result.message.data=service.searchTodayClass(date,cycle);
 		return result;
 	}	
+	//学员管理跳转controller
+	@RequestMapping("/searchClassStuJump")
+	public String searchClassStuJump( Model model,String clid) {
+	        model.addAttribute("clid", clid);
+	        return "classStuManage.html";
+	    }   
+	//学员管理-查询该节课的所有学员信息
+	@RequestMapping(value="/searchClassStu",method=RequestMethod.GET)
+	@ResponseBody
+	public RestResult searchClassStu(String clid)
+	{
+		RestResult result=new RestResult();
+		result.state=0;
+		result.error="";
+		result.message=new RestMessage();
+		result.message.data=service.searchClassStu(clid);
+		return result;
+	}
+	//获取系统上面所有的学员信息-并判断是否在该班级
+	@RequestMapping(value="/searchAllStu",method=RequestMethod.GET)
+	@ResponseBody
+	public RestResult searchAllStu(String clid)
+	{
+		RestResult result=new RestResult();
+		result.state=0;
+		result.error="";
+		result.message=new RestMessage();
+		result.message.data=service.searchAllStu(clid);
+		return result;
+	}
+	//编辑学员-将学员从该课批量删除，将某些学员批量添加到该课程
+	
+	
 }

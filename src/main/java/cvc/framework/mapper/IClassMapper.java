@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Select;
 
 import cvc.framework.entity.ClassTime;
 import cvc.framework.entity.Classes;
+import cvc.framework.entity.Student;
 
 @Mapper
 public interface IClassMapper 
@@ -84,10 +85,35 @@ public interface IClassMapper
 			+ "where ct.clid=cl.clid "
 			+ ")")
 	@Results({
+		@Result(column="clid",property="clid"),
 		@Result(column="clname",property="clname"),
 		@Result(column="clenrolment",property="clenrolment"),
 		@Result(column="clstarttime",property="clstarttime"),
 		@Result(column="clendtime",property="clendtime"),
 	})
 	public List<Classes> searchTodayClass(Date todayTime,int cycle);
+	
+	//学员管理-查询学员详情
+	@Select("select stu.stname stname,FLOOR(MONTHS_BETWEEN(SYSDATE,stu.stbirthday)/12) stage from T_CLASSSTUDENTS ct,T_STUDENTS stu where ct.clid=#{clid} and ct.stid=stu.stid")
+	@Results({
+		@Result(column="stname",property="stname"),
+		@Result(column="stage",property="stage"),
+	})
+	public List<Student> searchClassStu(String clid);
+	//查询系统上面所有的学员的信息
+	@Select("select * from  "
+			+ "(select stu.stid stid,stu.stname,FLOOR(MONTHS_BETWEEN(SYSDATE,stu.stbirthday)/12) stage,stu.stgender stgender from T_STUDENTS stu) a "
+			+ "left join "
+			+ "(select st.stid stid, st.clid clid from T_CLASSSTUDENTS st "
+			+ "where st.clid=#{clid}) b "
+			+ "on a.stid=b.stid "
+			+ "")
+	@Results({
+		@Result(column="stname",property="stname"),
+		@Result(column="stage",property="stage"),
+		@Result(column="stgender",property="stgender"),
+		@Result(column="clid",property="clid"),
+		@Result(column="stid",property="stid"),
+	})
+	public List<Student> searchAllStu(String clid);
 }
