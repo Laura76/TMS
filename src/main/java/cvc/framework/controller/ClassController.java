@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import cvc.framework.entity.ClassStu;
 import cvc.framework.entity.Classes;
 import cvc.framework.result.RestMessage;
 import cvc.framework.result.RestResult;
@@ -92,7 +93,7 @@ public class ClassController {
 	public String searchClassStuJump( Model model,String clid) {
 	        model.addAttribute("clid", clid);
 	        return "classStuManage.html";
-	    }   
+	 }   
 	//学员管理-查询该节课的所有学员信息
 	@RequestMapping(value="/searchClassStu",method=RequestMethod.GET)
 	@ResponseBody
@@ -117,7 +118,56 @@ public class ClassController {
 		result.message.data=service.searchAllStu(clid);
 		return result;
 	}
-	//编辑学员-将学员从该课批量删除，将某些学员批量添加到该课程
-	
-	
+	//编辑学员-将学员从该课批量删除，将某些学员批量添加到该课程--批量以后做，先一条一条添加 
+	@RequestMapping(value="/addStu",method=RequestMethod.POST)
+	@ResponseBody
+	public RestResult addStu(@RequestBody ClassStu classStu)
+	{
+		RestResult result=new RestResult();
+		result.state=0;
+		result.error="";
+		result.message=new RestMessage();
+		String clid=classStu.getClid();
+		//添加学员
+		for(String str:classStu.getAddStu()) {
+			if(service.addStu(new ClassStu(clid,str))==0) {
+				result.message.data=0;
+				return result;
+			};
+		}
+		//删除学员
+		for(String str:classStu.getDeleteStu()) {
+			if(service.deleteStu(clid,str)==0) {
+				result.message.data=0;
+				return result;
+			};
+		}
+		result.message.data=1;
+		return result;
+	}
+	//学员签到跳转controller
+	@RequestMapping("/stuSignIn")
+	public String stuSignIn( Model model,String clid) {
+	        model.addAttribute("clid", clid);
+	        return "classSignIn.html";
+	 }   
+	//查询某门课程的所有学员的签到情况--没有记录的签到情况为无
+	@RequestMapping(value="/searchStuSignIn",method=RequestMethod.GET)
+	@ResponseBody
+	public RestResult searchStuSignIn(String clid,String sitime)
+	{
+		RestResult result=new RestResult();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");//小写的mm表示的是分钟
+		try {
+			Date date=sdf.parse(sitime);
+			result.state=0;
+			result.error="";
+			result.message=new RestMessage();
+			result.message.data=service.searchStuSignIn(clid,date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
 }

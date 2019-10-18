@@ -3,6 +3,7 @@ package cvc.framework.mapper;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -10,8 +11,10 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 
+import cvc.framework.entity.ClassStu;
 import cvc.framework.entity.ClassTime;
 import cvc.framework.entity.Classes;
+import cvc.framework.entity.SignIn;
 import cvc.framework.entity.Student;
 
 @Mapper
@@ -116,4 +119,32 @@ public interface IClassMapper
 		@Result(column="stid",property="stid"),
 	})
 	public List<Student> searchAllStu(String clid);
+	
+	@Insert("insert into T_CLASSSTUDENTS (CLID,STID) values"
+			+ "("
+			+ "#{clid},#{stid}"
+			+ ")")
+	@Options(useGeneratedKeys = true,keyColumn = "csid")
+	//插入成功返回1
+	public int addStu(ClassStu classStu);
+	
+	@Delete("delete from T_CLASSSTUDENTS where clid=#{clid} and stid=#{stid}")
+	public int deleteStu(String clid,String stid);
+	
+	//查询系统上面所有的学员的信息
+	@Select("select *"
+			+ "from "
+			+ "(select cs.stid stid,st.stname stname "
+			+ "from T_CLASSSTUDENTS cs,T_STUDENTS st "
+			+ "where cs.clid=#{clid} and cs.stid=st.stid) a "
+			+ "left join "
+			+ "(select si.stid stid,si.sistate sistate "
+			+ "from T_SIGNIN si "
+			+ "where si.clid=#{clid} and si.sitime=#{sitime}) b "
+			+ " on a.stid=b.stid ")
+	@Results({
+		@Result(column="stname",property="stname"),
+	})
+	public List<SignIn> searchStuSignIn(String clid,Date sitime);
+	
 }

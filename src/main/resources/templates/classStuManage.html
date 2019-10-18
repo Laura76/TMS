@@ -100,7 +100,7 @@ layui.use(['table','form','laydate'], function()
 	            '</form>'+
 	            '<form class="layui-form" action="" id="stuInfotable">'+
 	            '<div class="layui-form-item">'+
-	            '  <table id="allStu" lay-filter="test" class="tmstable"></table>'+
+	            '  <table id="allStu" lay-filter="stuTable" class="tmstable"></table>'+
 	            '</div>'+
 	            '<div class="layui-form-item">'+
 	            '<div class="layui-input-block">'+
@@ -121,7 +121,7 @@ layui.use(['table','form','laydate'], function()
 			    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
 			    ,cols: [
 			    	[
-				    {fixed: 'right', title: '', toolbar: '#tableBtn', width: 60, align: 'center'},
+				    {field: 'right', title: '', toolbar: '#tableBtn', width: 60, align: 'center'},
 			    	{field: 'number', title: '序号'},
 			    	{field: 'stname', title: '姓名'},
 			    	{field: 'stgender', title: '性别'},
@@ -135,7 +135,9 @@ layui.use(['table','form','laydate'], function()
 					for(let i=0;i<temp.length;i++){
 						temp[i].stgender=(temp[i].stgender==1)?'男':'女';
 						temp[i].number=i+1;
-						if(temp[i].clid!=null)oldStu.push(temp[i].stid);//记录下原先的学生的stid
+						if(temp[i].clid!=null){
+							oldStu.push(temp[i].stid);//记录下原先的学生的stid
+						}
 					}
 			    	//res 即为原始返回的数据
 			        return {
@@ -149,18 +151,45 @@ layui.use(['table','form','laydate'], function()
       	   //监听提交
       	    form.on('submit(stuConfirm)', function(data){
       	    	var newStu=[];
-      	    	console.log(data.field);
       	    	for(var i in data.field){
       	    		if(data.field[i]=='on'){
       	    			newStu.push(i);
       	    		}
       	    	}
+      	    	var oldSet = new Set(oldStu);
+      	    	var newSet = new Set(newStu);
       	    	var deleteStu=[];
       	    	var addStu=[];
-      	    	for(let j=0;j<oldStu.length;j++){
-      	    		if()
+      	    	for (let item of oldSet) {
+      	    	    if(!newSet.has(item)){
+      	    	    	deleteStu.push(item);
+      	    	    }
       	    	}
-      	      return false;
+      	    	for (let item of newSet) {
+      	    	    if(!oldSet.has(item)){
+      	    	    	addStu.push(item);
+      	    	    }
+      	    	}
+      	    	data.field.deleteStu=deleteStu;
+      	    	data.field.addStu=addStu;
+      	    	data.field.clid=clid;
+      	    	$.ajax({
+      	          url:'/addStu',
+      	          type:'post',
+      	          dataType:'json',
+      	          contentType: 'application/json;charset=utf-8',
+      	          data:JSON.stringify(data.field),
+      	          timeout:2000,
+      	          success:function(data){
+      	        	layer.msg("添加成功");
+                    //跳转到另一个页面，使用URL的方式
+                    location.href = "/searchClassStuJump?clid="+clid;
+      	          },
+      	          error:function () {
+      	              layer.msg("密码或者用户名错误")
+      	          }
+      	      });
+      	       return false;
       	    });
 	        },
 		 });
@@ -169,9 +198,9 @@ layui.use(['table','form','laydate'], function()
 </script>
 <script type="text/html" id="tableBtn">
 	{{#if (d.clid == null) { }}
-	<input type="checkbox" name={{d.stid}} lay-skin="primary" title="">
+	<input type="checkbox" name={{d.stid}} lay-skin="primary" title="" lay-event="false">
 	{{# }else{ }}
-	<input type="checkbox" name={{d.stid}} lay-skin="primary" title="" checked="">
+	<input type="checkbox" name={{d.stid}} lay-skin="primary" title="" checked="" lay-event="true">
 	{{# } }}
 </script>
 </body>

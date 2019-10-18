@@ -9,8 +9,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cvc.framework.entity.ClassStu;
 import cvc.framework.entity.ClassTime;
 import cvc.framework.entity.Classes;
+import cvc.framework.entity.SignIn;
 import cvc.framework.entity.Student;
 import cvc.framework.mapper.IClassMapper;
 
@@ -60,5 +62,14 @@ public class ClassService
 	}
 	public List<Student> searchAllStu(String clid){
 		return mapper.searchAllStu(clid);
+	}
+	public int addStu(ClassStu classStu) {
+		return mapper.addStu(classStu);
+	}
+	public int deleteStu(String clid,String stid) {
+		return mapper.deleteStu(clid,stid);
+	}
+	public List<SignIn> searchStuSignIn(String clid,Date sitime){
+		return mapper.searchStuSignIn(clid,sitime);
 	}
 }
