@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./layui/css/layui.css"  media="all">
   <link rel="stylesheet" href="./css/tms.css" media="all"> 
   <script src="./layui/layui.js" charset="utf-8"></script> 
+  <script src="./js/suwan.js" charset="utf-8"></script>
 </head>
 <body>
   <div class="layui-row tmsrow">
@@ -33,10 +34,10 @@
     <div class="layui-inline">
       <label class="layui-form-label">教师姓名:</label>
       <div class="layui-input-inline">
-        <input name="clname" autocomplete="off" class="layui-input">
+        <input name="tename" autocomplete="off" class="layui-input">
       </div>
       <div class="layui-input-inline">
-        <button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="demo1">查询</button>
+        <button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="searchTe">查询</button>
         <button type="button" class="layui-btn layui-btn-radius tmsbutton0">导出</button>
       </div>
     </div>
@@ -54,12 +55,51 @@
 	  var $=layui.jquery;
 	  var layer=layui.layer;
 	  var laydate = layui.laydate;
-	  form.on('submit(demo1)', function(data){
+	  form.on('submit(searchTe)', function(data){
 		var submitData=data.field;
-		if(submitData.clname==''&&submitData.teacher==''){
-			layer.msg('请输入班级或者教师');
+		if(submitData.tename==''){
+			table.render({
+			    elem:'#demo'
+			    ,url:'searchAllTe'
+			    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+			    ,cols: [
+			    	[
+			    	{field: 'tenumber', title: '序号'},
+			    	{field: 'tename', title: '姓名'},
+			    	{field: 'teidnumber', title: '身份证号码',width:180,},
+			    	{field: 'tegender', title: '性别'},
+			    	{field: 'teage', title: '年龄'},
+			    	{field: 'teworkdate', title: '入职日期'},
+			    	{field: 'teclass', title: '教学班级'},
+			    	{field: 'caname', title: '类别'},
+			    	{fixed: 'right', title: '操作', toolbar: '#tableBtn', align: 'center'},
+			    ]
+			    	]
+				,page:true
+				,parseData: function(res)
+			    {
+					var data=res.message.data;
+					//整理一下返回的数据，以正确的在数据表格中显示--需要修改：序号，性别，年龄，日期
+					for(let i=0;i<data.length;i++){
+						if(data[i].tegender==0)data[i].tegender='女';
+						else data[i].tegender='男';
+						let temp=data[i].teworkdate.substring(0,10);
+						data[i].teworkdate=temp;
+						data[i].teage=GetAge(data[i].tebirthday);
+						data[i].tenumber=i+1;
+					}
+			    	//res 即为原始返回的数据
+			        return {
+			          "code": res.state, //解析接口状态
+			          "msg": res.error, //解析提示文本
+			          "count":res.message.data.length, //解析数据长度
+			          "data": res.message.data //解析数据列表
+			        };
+			      }
+			  });
 			return false;
 		}else{
+			/**
 			$.ajax({
 		        url:'/class/searchClass',
 		        type:'post',
@@ -74,6 +114,8 @@
 		            layer.msg("密码或者用户名错误")
 		        }
 		    });
+			*/
+			return false;
 		}
 	  });
 	  $(document).on('click','#addTeacher',function(){
@@ -95,13 +137,13 @@
 	        	'<div class="layui-form-item">'+
 	        	'<label class="layui-form-label">教师姓名</label>'+
 	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
+	              '<input name="tename" id="tename" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
 	            '</div>'+
 	            '</div>'+
 	            '<div class="layui-form-item">'+
 	            '<label class="layui-form-label">性别</label>'+
 	            '<div class="layui-input-block">'+
-	              '<select name="interest" lay-filter="aihao">'+
+	              '<select name="tegender" lay-filter="aihao">'+
 	                '<option value="0" selected>男</option>'+
 	                '<option value="1" >女</option>'+
 	              '</select>'+
@@ -110,37 +152,37 @@
 	            '<div class="layui-form-item">'+
 	        	'<label class="layui-form-label">身份证号</label>'+
 	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
+	              '<input name="teidnumber" id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
 	            '</div>'+
 	            '</div>'+
 	            '<div class="layui-form-item">'+
 	        	'<label class="layui-form-label">出生时间</label>'+
 	        	'<div class="layui-input-block">'+
-	        	  '<input type="text" class="layui-input" id="test1">'+
+	        	  '<input name="tebirthday" type="text" class="layui-input" id="test1">'+
 	            '</div>'+
 	            '</div>'+
 	            '<div class="layui-form-item">'+
 	        	'<label class="layui-form-label">专业</label>'+
 	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
+	              '<input name="teprofessional" id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
 	            '</div>'+
 	            '</div>'+
 	            '<div class="layui-form-item">'+
 	        	'<label class="layui-form-label">学历</label>'+
 	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
+	              '<input name="teeducation" id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
 	            '</div>'+
 	            '</div>'+
 	            '<div class="layui-form-item">'+
 	        	'<label class="layui-form-label">入职时间</label>'+
 	        	'<div class="layui-input-block">'+
-	        	  '<input type="text" class="layui-input" id="test2">'+
+	        	  '<input name="teworkdate" type="text" class="layui-input" id="test2">'+
 	            '</div>'+
 	            '</div>'+
 	            '<div class="layui-form-item">'+
 	            '<label class="layui-form-label">类别</label>'+
 	            '<div class="layui-input-block">'+
-	              '<select name="interest" lay-filter="aihao">'+
+	              '<select name="caid" lay-filter="aihao">'+
 	                '<option value="0" selected>美术</option>'+
 	                '<option value="1" >音乐</option>'+
 	              '</select>'+
@@ -156,7 +198,7 @@
 	            '</div>'+
 	            '<div class="layui-col-md5" >'+
 	            '<div class="layui-row" style="margin-top:24%;">'+
-	            '<img src="/pic/profile.png"/>'+
+	            '<img id="teprofile" src="/pic/profile.png"/>'+
 	            '</div>'+
 	            '<div class="layui-row" style="margin-left:30%;">'+
 	            '<button type="button" class="layui-btn tmsbutton0" id="uploadBtn">'+
@@ -173,6 +215,7 @@
 	        	laydate.render({
 	        	    elem: '#test2' //指定元素
 	        	});
+	        	var picPath='';
 	        	layui.use('upload', function () {
 	    		    var upload = layui.upload;
 	    		    //执行实例
@@ -181,16 +224,27 @@
 	    		        , url: '/upload/setFileUpload' //上传接口
 	    		        , multiple: true
 	    		        , before: function (obj) {
+	    		        	//将每次选择的文件追加到文件队列
+	    		            var files = obj.pushFile();
+	    		            //图片预览
+	    		            //预读本地文件，如果是多文件，则会遍历。(不支持ie8/9)
+	    		            obj.preview(function(index, file, result){
+	    		              //console.log(index); //得到文件索引
+	    		              //console.log(file); //得到文件对象
+	    		              //console.log(result); //得到文件base64编码，比如图片
+	    		              var img=document.getElementById('teprofile')
+	    		              img.src=result;img.width=306;img.height=336;
+	    		            });
 	    		            //可设置回显
 	    		            console.log(obj)
 	    		        }
 	    		        , done: function (res) {
-	    				    console.log('s');
 	    		            console.log(res);
 	    		            //上传完毕回调
 	    		            if (res.code != 1000) {
 	    		                return layer.msg('上传失败');
 	    		            } else {
+	    		            	picPath=res.data.path;
 	    		                return layer.msg('上传成功');
 	    		            }
 	    		        }
@@ -198,7 +252,29 @@
 	    		            //请求异常回调
 	    		        }
 	    		    });
-	    		  });	  
+	    		  });	
+	        	//监听提交事件-将图片的路径上传
+	        	form.on('submit(demo1)', function(data){
+	        	  data.field.tephoto=picPath;
+	        	  data.field.tedelete=0;
+	        	  $.ajax({
+	      	          url:'/addTe',
+	      	          type:'post',
+	      	          dataType:'json',
+	      	          contentType: 'application/json;charset=utf-8',
+	      	          data:JSON.stringify(data.field),
+	      	          timeout:2000,
+	      	          success:function(data){
+	      	        	layer.msg("添加成功");
+	                    //跳转到另一个页面，使用URL的方式
+	                    location.href = "/tmsteacher";
+	      	          },
+	      	          error:function () {
+	      	              layer.msg("添加失败")
+	      	          }
+	      	      });
+	      	      return false;
+	      	    });
 	        },
 		 });
 	  });
