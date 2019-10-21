@@ -1,6 +1,7 @@
 package cvc.framework.entity;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class Student {
 	private String stname;
@@ -12,6 +13,8 @@ public class Student {
 	private Date stbirthday;
 	private String stphone;
 	private int clcount;
+	private Date stcreatetime;
+	private int stisdelete;
 	public Student() {}
 	public Student(String stname,int stage) {
 		this.stname=stname;
@@ -41,8 +44,10 @@ public class Student {
 	public void setClid(String clid) {
 		this.clid = clid;
 	}
+	//暂时自增一下，明天记得在数据库中把所有的表都修改掉
 	public String getStid() {
-		return stid;
+//		return stid;
+		return UUID.randomUUID().toString().substring(0,32);
 	}
 	public void setStid(String stid) {
 		this.stid = stid;
@@ -70,5 +75,17 @@ public class Student {
 	}
 	public void setClcount(int clcount) {
 		this.clcount = clcount;
+	}
+	public Date getStcreatetime() {
+		return stcreatetime;
+	}
+	public void setStcreatetime(Date stcreatetime) {
+		this.stcreatetime = stcreatetime;
+	}
+	public int getStdelete() {
+		return stisdelete;
+	}
+	public void setStdelete(int stdelete) {
+		this.stisdelete = stdelete;
 	}
 }

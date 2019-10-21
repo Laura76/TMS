@@ -47,7 +47,8 @@
     </div>
   </div>
   </form>
-  <button  type="button" class="layui-btn tmsbutton2" id="addStu">添加学员</button>
+  <button  type="button" class="layui-btn tmsbutton1" id="addStu">添加学员</button>
+  <button  type="button" class="layui-btn tmsbutton2" id="uploadStu">批量导入</button>
   <table id="demo" lay-filter="test"></table>
   </div>
   <script type="text/html" id="tableBtn">
@@ -57,13 +58,14 @@
 	<i class="layui-icon layui-icon-delete"></i>删除</a>
 </script>
   <script>
-  layui.use(['table','form','laydate'], function()
+  layui.use(['table','form','laydate','upload'], function()
 	{
 	  var table = layui.table;
 	  var form=layui.form;
 	  var $=layui.jquery;
 	  var layer=layui.layer;
 	  var laydate = layui.laydate;
+	  var upload = layui.upload;
 	  var ins1,tabledata;
 	  //查询学员
 	  form.on('submit(demo1)', function(data){
@@ -115,6 +117,33 @@
 	  $(document).on('click','#exportXLS',function(){
 		  table.exportFile(ins1.config.id, tabledata,'xls');
 	  });
+	//批量导入
+	layui.use('upload', function () {
+		    var upload = layui.upload;
+		    //执行实例
+		    var uploadInst = upload.render({
+		        elem: '#uploadStu' //绑定元素
+		        , url: '/addManySt' //上传接口
+		        ,accept: 'file' //普通文件
+		        ,exts: 'xls|excel|xlsx' //只允许上传压缩文件
+		        , before: function (obj) {
+		            //可设置回显
+		        }
+		        , done: function (res) {
+		            console.log(res);
+		            //上传完毕回调
+		            if (res.code != 1000) {
+		                return layer.msg('上传失败');
+		            } else {
+		            	picPath=res.data.path;
+		                return layer.msg('上传成功');
+		            }
+		        }
+		        , error: function () {
+		            //请求异常回调
+		        }
+		    });
+		  });		    
 	  //添加学员
 	  $(document).on('click','#addStu',function(){
 		  layer.open({
@@ -185,6 +214,7 @@
 		      	          dataType:'json',
 		      	          contentType: 'application/json;charset=utf-8',
 		      	          timeout:2000,
+		      	          data:JSON.stringify(data.field),
 		      	          success:function(data){
 		      	        	layer.msg("添加成功");
 		                    //跳转到另一个页面，使用URL的方式
