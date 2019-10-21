@@ -44,4 +44,16 @@ public class TeacherController {
 		result.message.data=service.searchAllTe();
 		return result;
 	}
+	//导出简历--获取某教师的详细信息
+	@RequestMapping(value="/downloadResume",method=RequestMethod.GET)
+	@ResponseBody
+	public RestResult downloadResume(String teid) {
+		RestResult result=new RestResult();
+		result.state=0;
+		result.error="";
+		result.message=new RestMessage();
+		result.message.data=service.downloadResume(teid);
+		return result;
+	}
+	
 }

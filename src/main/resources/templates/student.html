@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./layui/css/layui.css"  media="all">
   <link rel="stylesheet" href="./css/tms.css" media="all"> 
   <script src="./layui/layui.js" charset="utf-8"></script> 
+  <script src="./js/suwan.js" charset="utf-8"></script>
 </head>
 <body>
   <div class="layui-row tmsrow">
@@ -33,7 +34,7 @@
     <div class="layui-inline">
       <label class="layui-form-label">学员姓名:</label>
       <div class="layui-input-inline">
-        <input name="clname" autocomplete="off" class="layui-input">
+        <input name="stname" autocomplete="off" class="layui-input">
       </div>
       <label class="layui-form-label">班级名称:</label>
       <div class="layui-input-inline">
@@ -41,15 +42,20 @@
       </div>
       <div class="layui-input-inline">
         <button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="demo1">查询</button>
-        <button type="button" class="layui-btn layui-btn-radius tmsbutton0">导出</button>
+        <button type="button" class="layui-btn layui-btn-radius tmsbutton0" id="exportXLS">导出</button>
       </div>
     </div>
   </div>
   </form>
-  <button  type="button" class="layui-btn tmsbutton2" id="addTeacher">添加学员</button>
+  <button  type="button" class="layui-btn tmsbutton2" id="addStu">添加学员</button>
   <table id="demo" lay-filter="test"></table>
   </div>
-  
+  <script type="text/html" id="tableBtn">
+	<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+	<i class="layui-icon layui-icon-edit"></i>编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+	<i class="layui-icon layui-icon-delete"></i>删除</a>
+</script>
   <script>
   layui.use(['table','form','laydate'], function()
 	{
@@ -58,154 +64,141 @@
 	  var $=layui.jquery;
 	  var layer=layui.layer;
 	  var laydate = layui.laydate;
+	  var ins1,tabledata;
+	  //查询学员
 	  form.on('submit(demo1)', function(data){
 		var submitData=data.field;
-		if(submitData.clname==''&&submitData.teacher==''){
-			layer.msg('请输入班级或者教师');
-			return false;
+		if(submitData.clname==''&&submitData.stname==''){
+			ins1=table.render({
+			    elem:'#demo'
+			    ,url:'getAllStu'
+			    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+			    ,cols: [
+			    	[
+			    	{field: 'stnumber', title: '序号'},
+			    	{field: 'stname', title: '姓名'},
+			    	{field: 'stidnumber', title: '身份证号码',width:180,},
+			    	{field: 'stgender', title: '性别'},
+			    	{field: 'stage', title: '年龄'},
+			    	{field: 'clcount', title: '报班数量'},
+			    	{field: 'stphone', title: '联系电话'},
+			    	{fixed: 'right', title: '操作', toolbar: '#tableBtn', width:400,align: 'center'},
+			    ]
+			    	]
+				,page:true
+				,parseData: function(res)
+			    {
+					var data=res.message.data;
+					//修改返回值的序号、年龄、性别属性
+					for(let i=0;i<data.length;i++){
+						data[i].stnumber=i+1;
+						data[i].stage=GetAge(data[i].stbirthday);
+						if(data[i].stgender==0)data[i].stgender='女';
+						else data[i].stgender='男';
+					}
+					tabledata=data;
+			    	//res 即为原始返回的数据
+			        return {
+			          "code": res.state, //解析接口状态
+			          "msg": res.error, //解析提示文本
+			          "count":res.message.data.length, //解析数据长度
+			          "data": res.message.data //解析数据列表
+			        };
+			      }
+			  });
 		}else{
-			$.ajax({
-		        url:'/class/searchClass',
-		        type:'post',
-		        dataType:'json',
-		        contentType: 'application/json;charset=utf-8',
-		        data:JSON.stringify(submitData),
-		        timeout:2000,
-		        success:function(data){
-		            
-		        },
-		        error:function () {
-		            layer.msg("密码或者用户名错误")
-		        }
-		    });
+			
 		}
+		return false;
 	  });
-	  $(document).on('click','#addTeacher',function(){
+	  //导出xls文件
+	  $(document).on('click','#exportXLS',function(){
+		  table.exportFile(ins1.config.id, tabledata,'xls');
+	  });
+	  //添加学员
+	  $(document).on('click','#addStu',function(){
 		  layer.open({
-			skin:'demo-class'
-	        ,type: 1
-	        ,title: ['添加教师','text-align:center']
-	        ,closeBtn: 1
-	        ,area: ['800px','510px']
-	        ,offset:'100px'
-	        ,shade: 0.8
-	        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
-	        ,shade:0
-	        ,moveType: 1 //拖拽模式，0或者1
-	        ,content: 
-	        	'<div class="layui-row">'+
-	        	'<div class="layui-col-md7">'+
-	        	'<form class="layui-form" action="" id="innerform">'+
-	        	'<div class="layui-form-item">'+
-	        	'<label class="layui-form-label">教师姓名</label>'+
-	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	            '<label class="layui-form-label">性别</label>'+
-	            '<div class="layui-input-block">'+
-	              '<select name="interest" lay-filter="aihao">'+
-	                '<option value="0" selected>男</option>'+
-	                '<option value="1" >女</option>'+
-	              '</select>'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	        	'<label class="layui-form-label">身份证号</label>'+
-	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	        	'<label class="layui-form-label">出生时间</label>'+
-	        	'<div class="layui-input-block">'+
-	        	  '<input type="text" class="layui-input" id="test1">'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	        	'<label class="layui-form-label">专业</label>'+
-	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	        	'<label class="layui-form-label">学历</label>'+
-	        	'<div class="layui-input-block">'+
-	              '<input id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	        	'<label class="layui-form-label">入职时间</label>'+
-	        	'<div class="layui-input-block">'+
-	        	  '<input type="text" class="layui-input" id="test2">'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	            '<label class="layui-form-label">类别</label>'+
-	            '<div class="layui-input-block">'+
-	              '<select name="interest" lay-filter="aihao">'+
-	                '<option value="0" selected>美术</option>'+
-	                '<option value="1" >音乐</option>'+
-	              '</select>'+
-	            '</div>'+
-	            '</div>'+
-	            '<div class="layui-form-item">'+
-	            '<div class="layui-input-block">'+
-	              '<button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="demo1">确定</button>'+
-	              '<button type="reset" class="layui-btn layui-btn-primary tmsbutton0">取消</button>'+
-	            '</div>'+
-	            '</div>'+
-	            '</form>'+
-	            '</div>'+
-	            '<div class="layui-col-md5" >'+
-	            '<div class="layui-row" style="margin-top:24%;">'+
-	            '<img src="/pic/profile.png"/>'+
-	            '</div>'+
-	            '<div class="layui-row" style="margin-left:30%;">'+
-	            '<button type="button" class="layui-btn tmsbutton0" id="uploadBtn">'+
-    			'上传头像'+
-				'</button>'+
-				'</div>'+
-	            '</div>'+
-	            '</div>'
-	        ,success:function(){
-	        	form.render();
-	        	laydate.render({
-	        	    elem: '#test1' //指定元素
-	        	});
-	        	laydate.render({
-	        	    elem: '#test2' //指定元素
-	        	});
-	        	layui.use('upload', function () {
-	    		    var upload = layui.upload;
-	    		    //执行实例
-	    		    var uploadInst = upload.render({
-	    		        elem: '#uploadBtn' //绑定元素
-	    		        , url: '/upload/setFileUpload' //上传接口
-	    		        , multiple: true
-	    		        , before: function (obj) {
-	    		            //可设置回显
-	    		            console.log(obj)
-	    		        }
-	    		        , done: function (res) {
-	    				    console.log('s');
-	    		            console.log(res);
-	    		            //上传完毕回调
-	    		            if (res.code != 1000) {
-	    		                return layer.msg('上传失败');
-	    		            } else {
-	    		                return layer.msg('上传成功');
-	    		            }
-	    		        }
-	    		        , error: function () {
-	    		            //请求异常回调
-	    		        }
-	    		    });
-	    		  });	  
-	        },
-		 });
-	  });
+				skin:'demo-class'
+		        ,type: 1
+		        ,title: ['添加学员','text-align:center']
+		        ,closeBtn: 1
+		        ,area: ['800px','510px']
+		        ,offset:'100px'
+		        ,shade: 0.8
+		        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+		        ,shade:0
+		        ,moveType: 1 //拖拽模式，0或者1
+		        ,content: 
+		        	'<div class="layui-row">'+
+		        	'<form class="layui-form" action="" id="innerform">'+
+		        	'<div class="layui-form-item">'+
+		        	'<label class="layui-form-label">学员姓名</label>'+
+		        	'<div class="layui-input-block">'+
+		              '<input name="stname" id="tename" type="text" lay-verify="title" autocomplete="off"  class="layui-input">'+
+		            '</div>'+
+		            '</div>'+
+		            '<div class="layui-form-item">'+
+		            '<label class="layui-form-label">性别</label>'+
+		            '<div class="layui-input-block">'+
+		              '<select name="stgender" lay-filter="aihao">'+
+		                '<option value="0" selected>男</option>'+
+		                '<option value="1" >女</option>'+
+		              '</select>'+
+		            '</div>'+
+		            '</div>'+
+		            '<div class="layui-form-item">'+
+		        	'<label class="layui-form-label">身份证号</label>'+
+		        	'<div class="layui-input-block">'+
+		              '<input name="stidnumber" id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
+		            '</div>'+
+		            '</div>'+
+		            '<div class="layui-form-item">'+
+		        	'<label class="layui-form-label">出生时间</label>'+
+		        	'<div class="layui-input-block">'+
+		        	  '<input name="stbirthday" type="text" class="layui-input" id="test1">'+
+		            '</div>'+
+		            '</div>'+
+		            '<div class="layui-form-item">'+
+		        	'<label class="layui-form-label">联系电话</label>'+
+		        	'<div class="layui-input-block">'+
+		              '<input name="stphone" id="tename" type="text" lay-verify="title" autocomplete="off"class="layui-input">'+
+		            '</div>'+
+		            '</div>'+
+		            '<div class="layui-form-item">'+
+		            '<div class="layui-input-block">'+
+		              '<button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="demo1">确定</button>'+
+		              '<button type="reset" class="layui-btn layui-btn-primary tmsbutton0">取消</button>'+
+		            '</div>'+
+		            '</div>'+
+		            '</form>'+
+		            '</div>'
+		        ,success:function(){
+		        	form.render();
+		        	laydate.render({
+		        	    elem: '#test1' //指定元素
+		        	});
+		        	//监听提交事件-将图片的路径上传
+		        	form.on('submit(demo1)', function(data){
+		        	  $.ajax({
+		      	          url:'/addSt',
+		      	          type:'post',
+		      	          dataType:'json',
+		      	          contentType: 'application/json;charset=utf-8',
+		      	          timeout:2000,
+		      	          success:function(data){
+		      	        	layer.msg("添加成功");
+		                    //跳转到另一个页面，使用URL的方式
+		                    location.href = "/tmsstudent";
+		      	          },
+		      	          error:function () {
+		      	              layer.msg("添加失败")
+		      	          }
+		      	      });
+		      	      return false;
+		      	    });
+		        },
+			 });
+		  });
 	  
 	});
 </script>

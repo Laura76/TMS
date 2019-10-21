@@ -15,9 +15,14 @@ public class Teacher{
 	int tedelete;
 	String caid;
 	String caname;
+	//生成简历的辅助属性
+	Date clstarttime;
+	Date clendtime;
+	String clname;
+	int stcount;
 	//设置数据库为自动生成ID（如果没有设置的话暂时使用uuid代替）
 	public String getTeid() {
-		return UUID.randomUUID().toString().substring(0,32);
+		return teid;
 	}
 	public void setTeid(String teid) {
 		this.teid = teid;
@@ -87,6 +92,30 @@ public class Teacher{
 	}
 	public void setCaname(String caname) {
 		this.caname = caname;
+	}
+	public Date getClstarttime() {
+		return clstarttime;
+	}
+	public void setClstarttime(Date clstarttime) {
+		this.clstarttime = clstarttime;
+	}
+	public Date getClendtime() {
+		return clendtime;
+	}
+	public void setClendtime(Date clendtime) {
+		this.clendtime = clendtime;
+	}
+	public String getClname() {
+		return clname;
+	}
+	public void setClname(String clname) {
+		this.clname = clname;
+	}
+	public int getStcount() {
+		return stcount;
+	}
+	public void setStcount(int stcount) {
+		this.stcount = stcount;
 	}
 	
 	

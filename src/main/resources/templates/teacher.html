@@ -38,7 +38,7 @@
       </div>
       <div class="layui-input-inline">
         <button type="submit" class="layui-btn tmsbutton0" lay-submit="" lay-filter="searchTe">查询</button>
-        <button type="button" class="layui-btn layui-btn-radius tmsbutton0">导出</button>
+        <button type="button" class="layui-btn layui-btn-radius tmsbutton0" id="exportXLS">导出</button>
       </div>
     </div>
   </div>
@@ -46,7 +46,16 @@
   <button  type="button" class="layui-btn tmsbutton2" id="addTeacher">添加教师</button>
   <table id="demo" lay-filter="test"></table>
   </div>
-  
+  <script type="text/html" id="tableBtn">
+	<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">
+	<i class="layui-icon layui-icon-edit"></i>编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">
+	<i class="layui-icon layui-icon-delete"></i>删除</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="stuManage" id="stuManage"><i
+    class="layui-icon layui-icon-edit"></i>生成简历</a>
+	<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="downloadResume"><i
+    class="layui-icon layui-icon-edit"></i>下载简历</a>
+</script>
   <script>
   layui.use(['table','form','laydate'], function()
 	{
@@ -55,10 +64,11 @@
 	  var $=layui.jquery;
 	  var layer=layui.layer;
 	  var laydate = layui.laydate;
+	  var ins1,tabledata;
 	  form.on('submit(searchTe)', function(data){
 		var submitData=data.field;
 		if(submitData.tename==''){
-			table.render({
+			ins1=table.render({
 			    elem:'#demo'
 			    ,url:'searchAllTe'
 			    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
@@ -72,7 +82,7 @@
 			    	{field: 'teworkdate', title: '入职日期'},
 			    	{field: 'teclass', title: '教学班级'},
 			    	{field: 'caname', title: '类别'},
-			    	{fixed: 'right', title: '操作', toolbar: '#tableBtn', align: 'center'},
+			    	{fixed: 'right', title: '操作', toolbar: '#tableBtn', width:400,align: 'center'},
 			    ]
 			    	]
 				,page:true
@@ -88,6 +98,7 @@
 						data[i].teage=GetAge(data[i].tebirthday);
 						data[i].tenumber=i+1;
 					}
+					tabledata=data;
 			    	//res 即为原始返回的数据
 			        return {
 			          "code": res.state, //解析接口状态
@@ -117,6 +128,32 @@
 			*/
 			return false;
 		}
+	  });
+	  $(document).on('click','#exportXLS',function(){
+		  table.exportFile(ins1.config.id, tabledata,'xls');
+	  });
+	//监听工具条事件
+	table.on('tool(test)', function(obj){
+	    var data = obj.data;
+	    //导出简历--前端传入教师id和word文件保存的地址和名称？
+	    if(obj.event === 'downloadResume'){
+	    	var url = "downloadResume?teid="+data.teid;//此处拼接内容
+	    	$.ajax({
+		        url:url,
+		        dataType:'json',
+		        contentType: 'application/json;charset=utf-8',
+		        timeout:2000,
+		        success:function(data){
+		        	layer.msg("下载成功")
+		        },
+		        error:function () {
+		            layer.msg("下载失败")
+		        }
+		    });
+	    }else if(obj.event === 'stuSignIn'){
+	    	
+	    } 
+	    
 	  });
 	  $(document).on('click','#addTeacher',function(){
 		  layer.open({
