@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -144,15 +145,12 @@ public class ExcelUtil
 						
 						//  获取单元格值的格式化信息
 		                String dataFormat = xrow.getCell(j).getCellStyle().getDataFormatString();
-		                
-		              
-		                if(!StringUtil.IsNullOrEmpty(dataFormat))
+		                //日期暂时不判断-因为有bug
+		                if(HSSFDateUtil.isCellDateFormatted(xrow.getCell(j)))
 		                {
-		                	
 							Date date = xrow.getCell(j).getDateCellValue();
 							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 							cell=sdf.format(date);
-							
 //							DataFormatter formatter = new DataFormatter();  
 //							String retValue = formatter.formatCellValue(xrow.getCell(j));  
 		                }

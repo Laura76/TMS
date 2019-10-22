@@ -131,13 +131,7 @@
 		        }
 		        , done: function (res) {
 		            console.log(res);
-		            //上传完毕回调
-		            if (res.code != 1000) {
-		                return layer.msg('上传失败');
-		            } else {
-		            	picPath=res.data.path;
-		                return layer.msg('上传成功');
-		            }
+		            return layer.msg('上传成功');
 		        }
 		        , error: function () {
 		            //请求异常回调

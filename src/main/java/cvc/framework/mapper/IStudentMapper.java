@@ -1,9 +1,13 @@
 package cvc.framework.mapper;
 
 
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Result;
@@ -45,4 +49,23 @@ public interface IStudentMapper
 			+ ")")
 	@Options(useGeneratedKeys = true,keyProperty = "stid",keyColumn = "STID")
 	public int addStu(Student student);
+	
+	@InsertProvider(type = MyProvider.class, method = "batchInsert")
+    public int batchInsert(List<Student> students);
+	class MyProvider {
+		/* 批量插入 */
+        public String batchInsert(Map map) {
+        	List<Student> students = (List<Student>) map.get("list");
+            StringBuilder sb = new StringBuilder();
+            sb.append("INSERT ALL  ");
+            for(int i=0;i<students.size();i++) {
+            	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            	String dateString = formatter.format(students.get(i).getStbirthday());
+            	sb.append(" INTO T_STUDENTS (stname,stidnumber,stphone,stbirthday) VALUES ");
+            	sb.append(" ('"+students.get(i).getStname()+"','"+students.get(i).getStidnumber()+"','"+students.get(i).getStphone()+"',TO_DATE('"+dateString+""+"', 'yyyy-mm-dd')) ");
+            }
+           sb.append(" SELECT 1 FROM DUAL ");
+            return sb.toString();
+        }
+	}
 }

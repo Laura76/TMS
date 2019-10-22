@@ -16,9 +16,11 @@ public class Student {
 	private Date stcreatetime;
 	private int stisdelete;
 	public Student() {}
-	public Student(String stname,int stage) {
+	public Student(String stname ,String stidnumber,String stphone,Date stbirthday) {
 		this.stname=stname;
-		this.stage=stage;
+		this.stidnumber=stidnumber;
+		this.stphone=stphone;
+		this.stbirthday=stbirthday;
 	}
 	public String getStname() {
 		return stname;
@@ -46,8 +48,7 @@ public class Student {
 	}
 	//暂时自增一下，明天记得在数据库中把所有的表都修改掉
 	public String getStid() {
-//		return stid;
-		return UUID.randomUUID().toString().substring(0,32);
+		return stid;
 	}
 	public void setStid(String stid) {
 		this.stid = stid;
