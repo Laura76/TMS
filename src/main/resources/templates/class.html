@@ -98,6 +98,11 @@
 				,page:true
 				,parseData: function(res)
 			    {
+					var tabledata=res.message.data;
+					for(let i=0;i<tabledata.length;i++){
+						tabledata[i].clstarttime=tabledata[i].clstarttime.substring(0,10);
+						tabledata[i].clendtime=tabledata[i].clendtime.substring(0,10);
+					}
 			    	//res 即为原始返回的数据
 			        return {
 			          "code": res.state, //解析接口状态

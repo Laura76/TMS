@@ -24,7 +24,7 @@ public interface IStudentMapper
 	@Select("select * "
 			+ "from( "
 			+ "(select  st.stid,st.stname,st.stidnumber,st.stgender,st.stbirthday,st.stphone  "
-			+ "from T_STUDENTS st) a "
+			+ "from T_STUDENTS st where st.stisdelete=0) a "
 			+ "left join "
 			+ "(select cs.stid,count(cs.clid) clcount "
 			+ "from T_CLASSSTUDENTS cs "
@@ -61,8 +61,8 @@ public interface IStudentMapper
             for(int i=0;i<students.size();i++) {
             	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             	String dateString = formatter.format(students.get(i).getStbirthday());
-            	sb.append(" INTO T_STUDENTS (stname,stidnumber,stphone,stbirthday) VALUES ");
-            	sb.append(" ('"+students.get(i).getStname()+"','"+students.get(i).getStidnumber()+"','"+students.get(i).getStphone()+"',TO_DATE('"+dateString+""+"', 'yyyy-mm-dd')) ");
+            	sb.append(" INTO T_STUDENTS (stname,stidnumber,stphone,stbirthday,stisdelete) VALUES ");
+            	sb.append(" ('"+students.get(i).getStname()+"','"+students.get(i).getStidnumber()+"','"+students.get(i).getStphone()+"',TO_DATE('"+dateString+""+"', 'yyyy-mm-dd'),'0') ");
             }
            sb.append(" SELECT 1 FROM DUAL ");
             return sb.toString();
